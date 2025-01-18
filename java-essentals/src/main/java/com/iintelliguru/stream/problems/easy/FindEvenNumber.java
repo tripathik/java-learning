@@ -1,4 +1,4 @@
-package com.iintelliguru.stream.easy;
+package com.iintelliguru.stream.problems.easy;
 
 import java.util.Arrays;
 import java.util.List;
