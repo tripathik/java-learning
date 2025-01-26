@@ -15,5 +15,16 @@ public class JoinStringFromList {
         String result = String.join(", ", stringList);
         System.out.println(allDays);
         System.out.println("Result: "+result);
+
+        System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        squareOfNumber();
+    }
+
+    public static void squareOfNumber(){
+        List<Integer> integerNum = Arrays.asList(23, 17, 9, 56, 10, 25, 12);
+
+        List<Integer> squares = integerNum.stream().map(num -> num * num).collect(Collectors.toList());
+        System.out.println(squares);
+
     }
 }
