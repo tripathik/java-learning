@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class ExecutorServiceExample {
@@ -17,9 +19,10 @@ public class ExecutorServiceExample {
     // 3. Supports system overhead from creating too many threads.
     // 4. Supports various Thread Pool Strategies.
     public static void main(String[] args) {
-        //underStandFixedThreadPool();
-        //understandingCachedThreadPool();
+        underStandFixedThreadPool();
+        understandingCachedThreadPool();
         understandingSingleThreadPool();
+        understandingScheduledThreadPool();
     }
 
 
@@ -63,6 +66,30 @@ public class ExecutorServiceExample {
             final int taskId = i;
             executor.execute(()-> log.info("Task- {} is executed by Thread- {} in Single Thread pool.", taskId, Thread.currentThread().getName()));
         }
+        executor.shutdown();
+    }
+
+
+    // 4. ScheduledThreadPool:
+    // Used for executing the tasks at specified time or with a fixed delay between executions.
+    // Maintains a pool of threads and supports scheduling tasks with methods, schedule(),
+    // scheduleAtFixRate(), scheduleWithFixedDelay().
+    // UseCase => Can be used,if you need to update the cache after some fixed interval of time.
+    public static  void understandingScheduledThreadPool(){
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+        Runnable task = (()-> log.info("Repeating Task executed at; {} ", System.currentTimeMillis()));
+
+
+        // Schedule a task to execute after 5 seconds
+        scheduler.schedule(() ->
+                        task,
+                5, TimeUnit.SECONDS);
+
+        // Schedule a task to execute every 1 second, starting immediately
+        scheduler.scheduleAtFixedRate(() ->
+                        log.info("Scheduled Task at fixedRate"),
+                0, 1, TimeUnit.SECONDS);
+        scheduler.shutdown();
     }
 
 
