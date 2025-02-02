@@ -9,7 +9,7 @@
     <version>1.0</version>
     <packaging>pom</packaging>
     <modules>
-        <module>java-essentals</module>
+        <module>java-essentials</module>
     </modules>
 
     <parent>
