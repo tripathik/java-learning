@@ -17,8 +17,9 @@ public class ExecutorServiceExample {
     // 3. Supports system overhead from creating too many threads.
     // 4. Supports various Thread Pool Strategies.
     public static void main(String[] args) {
-        underStandFixedThreadPool();
-        understandingCachedThreadPool();
+        //underStandFixedThreadPool();
+        //understandingCachedThreadPool();
+        understandingSingleThreadPool();
     }
 
 
@@ -36,11 +37,12 @@ public class ExecutorServiceExample {
         }
         executor.shutdown();
     }
+
+
     // 2. CachedThreadPool:
     // It is used to maintain the thread dynamically as per the need or demand.
     // As per the need threads are created and also reused.
     // When there would be any unused thread, it will be terminated after some specified idle timeout.
-
     public static void understandingCachedThreadPool(){
         ExecutorService executor = Executors.newCachedThreadPool();
         for(int i = 1; i<=5; i++){
@@ -48,6 +50,22 @@ public class ExecutorServiceExample {
             executor.execute(() -> log.info("Task {} is executed by Thread: {}, in pool.", taskId, Thread.currentThread().getName()));
         }
     }
+
+
+
+    // 3. SingleThreadPool:
+    // Used for sequential executions of task by a single/only one thread in the pool.
+    // If due to any error the thread got terminated, the new thread is created to replace it.
+    // Can be used in case on any sequential execution of task.
+    public static  void understandingSingleThreadPool(){
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        for(int i =1; i<=5; i++){
+            final int taskId = i;
+            executor.execute(()-> log.info("Task- {} is executed by Thread- {} in Single Thread pool.", taskId, Thread.currentThread().getName()));
+        }
+    }
+
+
 
 
 }
