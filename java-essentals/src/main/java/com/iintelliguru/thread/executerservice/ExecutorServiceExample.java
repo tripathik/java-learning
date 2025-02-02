@@ -7,8 +7,8 @@ import java.util.concurrent.Executors;
 
 @Slf4j
 public class ExecutorServiceExample {
-    // EXECUTER_SERVICE: ExecuterService is a framework in Java which is used for managing the threads execution efficiently.
-    // => Instead of creating & managing threads manually we can use ExecuterService to manage the task
+    // EXECUTOR_SERVICE: ExecutorService is a framework in Java which is used for managing the threads execution efficiently.
+    // => Instead of creating & managing threads manually we can use ExecutorService to manage the task
     // asynchronously using thread-pooling.
 
     //Used For:
@@ -18,6 +18,7 @@ public class ExecutorServiceExample {
     // 4. Supports various Thread Pool Strategies.
     public static void main(String[] args) {
         underStandFixedThreadPool();
+        understandingCachedThreadPool();
     }
 
 
@@ -31,10 +32,22 @@ public class ExecutorServiceExample {
         ExecutorService executor = Executors.newFixedThreadPool(3);
         for(int i = 0; i<5; i++){
             final int taskId = i;
-            executor.execute(()->{
-                log.info("Task: {} is executed by Thread: {}", taskId, Thread.currentThread().getName());
-            });
+            executor.execute(()-> log.info("Task: {} is executed by Thread: {}", taskId, Thread.currentThread().getName()));
         }
         executor.shutdown();
     }
+    // 2. CachedThreadPool:
+    // It is used to maintain the thread dynamically as per the need or demand.
+    // As per the need threads are created and also reused.
+    // When there would be any unused thread, it will be terminated after some specified idle timeout.
+
+    public static void understandingCachedThreadPool(){
+        ExecutorService executor = Executors.newCachedThreadPool();
+        for(int i = 1; i<=5; i++){
+            final int taskId = i;
+            executor.execute(() -> log.info("Task {} is executed by Thread: {}, in pool.", taskId, Thread.currentThread().getName()));
+        }
+    }
+
+
 }
