@@ -27,7 +27,8 @@ public class VirtualThreadExample {
         };
 
         for(int i =0; i <numberOfThreads; i++){
-            Thread thread = Thread.ofVirtual().unstarted(objectRunnable);
+            //Thread thread = Thread.ofVirtual().unstarted(objectRunnable);
+            Thread thread = new Thread(objectRunnable);
             //thread.setDaemon(true);
             thread.setName("Thread "+i);
             thread.start();
