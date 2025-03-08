@@ -1,4 +1,4 @@
-package com.iintelliguru.thread;
+package com.iintelliguru.thread.forkjoin;
 
 import lombok.extern.slf4j.Slf4j;
 
