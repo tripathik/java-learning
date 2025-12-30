@@ -1,0 +1,149 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Request Process Rule Service - Lambda + API Gateway
+
+Parameters:
+  MongoConnectionString:
+    Type: String
+    NoEcho: true
+    Description: MongoDB connection string
+
+  RuleCollectionName:
+    Type: String
+    Default: RequestProcessRules
+
+Resources:
+
+  ### IAM ROLE ###
+  RuleLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: request-process-rule-lambda-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  ### LAMBDA FUNCTION ###
+  RuleLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: request-process-rule-handler
+      Runtime: java21
+      Handler: krishna.poc.mongo.handler.RuleHandler::handleRequest
+      MemorySize: 1024
+      Timeout: 30
+      Role: !GetAtt RuleLambdaExecutionRole.Arn
+      Code:
+        S3Bucket: your-lambda-artifacts-bucket
+        S3Key: mongodb-poc-0.0.1-SNAPSHOT.jar
+      Environment:
+        Variables:
+          MONGO_CONNECTION_STRING: !Ref MongoConnectionString
+          requestProcessRuleCollectionName: !Ref RuleCollectionName
+
+  ### API GATEWAY ###
+  RuleApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: request-process-rule-api
+
+  RulesResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RuleApi
+      ParentId: !GetAtt RuleApi.RootResourceId
+      PathPart: rules
+
+  RuleByNameResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RuleApi
+      ParentId: !Ref RulesResource
+      PathPart: "{ruleName}"
+
+  ### METHODS ###
+  GetRuleMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RuleApi
+      ResourceId: !Ref RuleByNameResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub >
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RuleLambdaFunction.Arn}/invocations
+
+  PostRuleMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RuleApi
+      ResourceId: !Ref RulesResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub >
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RuleLambdaFunction.Arn}/invocations
+
+  PutRuleMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RuleApi
+      ResourceId: !Ref RulesResource
+      HttpMethod: PUT
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub >
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RuleLambdaFunction.Arn}/invocations
+
+  DeleteRuleMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref RuleApi
+      ResourceId: !Ref RuleByNameResource
+      HttpMethod: DELETE
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub >
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RuleLambdaFunction.Arn}/invocations
+
+  ### LAMBDA PERMISSION ###
+  ApiGatewayInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref RuleLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub >
+        arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RuleApi}/*/*/*
+
+  ### DEPLOYMENT ###
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - GetRuleMethod
+      - PostRuleMethod
+      - PutRuleMethod
+      - DeleteRuleMethod
+    Properties:
+      RestApiId: !Ref RuleApi
+      StageName: prod
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway base URL
+    Value: !Sub "https://${RuleApi}.execute-api.${AWS::Region}.amazonaws.com/prod"
