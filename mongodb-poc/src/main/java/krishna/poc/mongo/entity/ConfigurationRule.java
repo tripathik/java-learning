@@ -18,7 +18,7 @@ import java.util.Map;
 public class ConfigurationRule {
     @BsonId
     @BsonProperty("_id")
-    @JsonProperty("_id")
+    @JsonProperty("RuleName")
     private String ruleName;
 
     @BsonProperty("RuleDescription")

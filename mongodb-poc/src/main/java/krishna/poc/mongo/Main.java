@@ -4,6 +4,7 @@ import com.mongodb.client.result.InsertOneResult;
 import krishna.poc.mongo.entity.ConfigurationRule;
 import krishna.poc.mongo.exception.JsonObjectConverterException;
 import krishna.poc.mongo.exception.MongoDocumentCreationException;
+import krishna.poc.mongo.exception.RuleNotFoundException;
 import krishna.poc.mongo.input.InputRules;
 import krishna.poc.mongo.service.RequestProcessRuleService;
 import krishna.poc.mongo.utils.CommonUtils;
@@ -11,9 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Main {
-    public static void main(String[] args) throws JsonObjectConverterException, MongoDocumentCreationException {
+    public static void main(String[] args) throws JsonObjectConverterException, MongoDocumentCreationException, RuleNotFoundException {
         RequestProcessRuleService requestProcessRuleService = new RequestProcessRuleService("RequestProcessRules");
-        String action = "delete";
+        String action = "insert";
         switch (action) {
             case "insert":
                 String rule = InputRules.RESPONSE_RULE;

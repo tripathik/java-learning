@@ -4,7 +4,7 @@ public class InputRules {
     private InputRules(){}
     public static final String ACCOUNT_RULE = """
             {
-               "_id": "Accounts",
+               "RuleName": "Accounts",
                "RuleDescription": "Rule tp process the Account Registration Request.",
                "CorrelationIdPath": "$.metadata.correlation_id",
                "MessageIdPath": "$.metadata.message_id",
@@ -31,7 +31,7 @@ public class InputRules {
 
     public static final String VEHICLE_RULE = """
             {
-               "_id": "Vehicles",
+               "RuleName": "Vehicles",
                "RuleDescription": "Rule tp process the Account Registration Request.",
                "CorrelationIdPath": "$.metadata.correlation_id",
                "MessageIdPath": "$.metadata.message_id",
@@ -57,7 +57,7 @@ public class InputRules {
 
     public static final String RESPONSE_RULE = """
             {
-               "_id": "Response",
+               "RuleName": "Response",
                "RuleDescription": "Rule tp process the Response Request.",
                "CorrelationIdPath": "$.metadata.correlation_id",
                "MessageIdPath": "$.metadata.message_id",

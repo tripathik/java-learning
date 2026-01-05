@@ -7,13 +7,15 @@ import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import krishna.poc.mongo.entity.ConfigurationRule;
 import krishna.poc.mongo.exception.MongoDocumentCreationException;
+import krishna.poc.mongo.exception.RuleNotFoundException;
 import krishna.poc.mongo.utils.client.MongoDBClient;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
 
 @Slf4j
 public class RequestProcessRuleService {
@@ -27,11 +29,23 @@ public class RequestProcessRuleService {
 
     // ---------- READ ----------
 
-    public ConfigurationRule getRuleByRuleName(String ruleName) {
+    public ConfigurationRule getRuleByRuleName(String ruleName) throws RuleNotFoundException {
+        Bson filter = and(
+                eq("_id", ruleName),
+                or(
+                        ne("ReadOnly", true),
+                        exists("ReadOnly", false)
+                )
+        );
+
         if (ruleName == null || ruleName.isBlank()) {
             throw new IllegalArgumentException("ruleName must not be null or empty");
         }
-        return collection.find(eq("_id", ruleName)).first();
+        ConfigurationRule rule = collection.find(filter).first();
+        if(rule == null){
+            throw new RuleNotFoundException("");
+        }
+        return rule;
     }
 
     public List<ConfigurationRule> getAllRules() {
